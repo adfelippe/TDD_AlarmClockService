@@ -31,6 +31,18 @@ void fillAlarmList(void)
     }
 }
 
+void isCallbackEmpty(uint32_t time)
+{
+    FakeTimeService_SetCurrentTimeInMiliseconds(time);
+    TEST_ASSERT_EQUAL(EMPTY, FakeTimeService_WakeUpRoutine());
+}
+
+void didCallbackRun(uint32_t time)
+{
+    FakeTimeService_SetCurrentTimeInMiliseconds(time);
+    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
+}
+
 void test_AlarmClock_AlarmCallbackListIsEmptyAfterInitialzation(void)
 {
     TEST_ASSERT_EQUAL(0, GetAmountOfSetAlarms());
@@ -40,18 +52,13 @@ void test_AlarmClock_AlarmDoesNotTriggerAtWrongTime(void)
 {
     SetAlarmClockCallback(500, DummyHello);
 
-    FakeTimeService_SetCurrentTimeInMiliseconds(400);
-
-    TEST_ASSERT_EQUAL(EMPTY, FakeTimeService_WakeUpRoutine());
+    isCallbackEmpty(400);
 }
 
 void test_AlarmClock_AlarmTriggersAtCorrectTime(void)
 {
     SetAlarmClockCallback(500, DummyHello);
-
-    FakeTimeService_SetCurrentTimeInMiliseconds(500);
-
-    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
+    didCallbackRun(500);
 }
 
 void test_AlarmClock_RejectsAlarmsNotMultipleOfOneHundredMilliseconds(void)
@@ -94,11 +101,8 @@ void test_AlarmClock_MultipleAlarmsTriggerAtCorrectTime(void)
     SetAlarmClockCallback(500, DummyHello);
     SetAlarmClockCallback(600, DummyHelloA);
 
-    FakeTimeService_SetCurrentTimeInMiliseconds(500);
-    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
-
-    FakeTimeService_SetCurrentTimeInMiliseconds(600);
-    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
+    didCallbackRun(500);
+    didCallbackRun(600);
 }
 
 void test_AlarmClock_SettingSameAlarmTimeTwiceIsRejected(void)
@@ -133,17 +137,10 @@ void test_AlarmClock_MultipleAlarmsSetDoNotTriggerAtWrongTimesButTriggerAtRightT
     SetAlarmClockCallback(500, DummyHello);
     SetAlarmClockCallback(700, DummyHello);
 
-    FakeTimeService_SetCurrentTimeInMiliseconds(400);
-    TEST_ASSERT_EQUAL(EMPTY, FakeTimeService_WakeUpRoutine());
-
-    FakeTimeService_SetCurrentTimeInMiliseconds(500);
-    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
-
-    FakeTimeService_SetCurrentTimeInMiliseconds(600);
-    TEST_ASSERT_EQUAL(EMPTY, FakeTimeService_WakeUpRoutine());
-
-    FakeTimeService_SetCurrentTimeInMiliseconds(700);
-    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
+    isCallbackEmpty(400);
+    didCallbackRun(500);
+    isCallbackEmpty(600);
+    didCallbackRun(700);
 }
 
 void test_AlarmClock_Deinit_Leaves_AlarmsListEmpty(void)

@@ -10,6 +10,8 @@ static Alarm scheduledAlarms[MAX_ALARMS];
 static void scheduleAlarm(Alarm *scheduledAlarm, int time, AlarmCallback callback);
 static int8_t getAlarmTimePositionFromList(uint32_t time);
 static void clearScheduledAlarms(void);
+static bool IsTimeMultipleOf100ms(uint32_t time);
+
 
 void AlarmClock_Init(void)
 {
@@ -23,10 +25,10 @@ void AlarmClock_Deinit(void)
 
 int SetAlarmClockCallback(int time, AlarmCallback callback)
 {
-    if (time == 0)
+    if (!time)
         return ALARM_IS_ZERO;
 
-    if (time % ALARMS_MULTIPLE_VALID_VALUE != 0)
+    if (!IsTimeMultipleOf100ms(time))
         return ALARM_NOT_MULTIPLE_OF_100MS;
 
     if (IsAlarmClockTimeSet(time))
@@ -105,4 +107,12 @@ static void clearScheduledAlarms(void)
         scheduledAlarms[i].callback = NULL;
         scheduledAlarms[i].time = 0;
     }
+}
+
+static bool IsTimeMultipleOf100ms(uint32_t time)
+{
+    if (time % ALARMS_MULTIPLE_VALID_VALUE == 0)
+        return true;
+    else
+        return false;
 }

@@ -7,3 +7,4 @@
 - Remove alarm callback works
 - Removed alarm callback doesn't trigger
 - Alarms are accepted only if time is a multiple of 100
+- Deinit leaves list empty
