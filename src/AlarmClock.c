@@ -7,10 +7,11 @@ typedef struct {
 
 static Alarm scheduledAlarms[MAX_ALARMS];
 
-static void scheduleAlarm(Alarm *scheduledAlarm, int time, AlarmCallback callback);
+static void scheduleAlarm(int8_t alarmSlot, uint32_t time, AlarmCallback callback);
 static int8_t getAlarmTimePositionFromList(uint32_t time);
 static void clearScheduledAlarms(void);
 static bool IsTimeMultipleOf100ms(uint32_t time);
+static int8_t FindEmptyAlarmSlot(void);
 
 
 void AlarmClock_Init(void)
@@ -34,14 +35,14 @@ int SetAlarmClockCallback(int time, AlarmCallback callback)
     if (IsAlarmClockTimeSet(time))
         return ALARM_ALREADY_SET;
 
-    for (int i = 0; i < MAX_ALARMS; i++) {
-        if (scheduledAlarms[i].time == 0) {
-            scheduleAlarm(&scheduledAlarms[i], time, callback);
-            return ALARM_SET_OK;
-        }
-    }
+    int8_t emptyAlarmSlot = FindEmptyAlarmSlot();
 
-    return ALARM_LIST_FULL;
+    if (emptyAlarmSlot < 0) {
+        return ALARM_LIST_FULL;
+    } else {
+        scheduleAlarm(emptyAlarmSlot, time, callback);
+        return ALARM_SET_OK;
+    }
 }
 
 uint32_t GetAmountOfSetAlarms(void)
@@ -95,10 +96,10 @@ static int8_t getAlarmTimePositionFromList(uint32_t time)
     return -1;
 }
 
-static void scheduleAlarm(Alarm *scheduledAlarm, int time, AlarmCallback callback)
+static void scheduleAlarm(int8_t alarmSlot, uint32_t time, AlarmCallback callback)
 {
-    scheduledAlarm->time = time;
-    scheduledAlarm->callback = callback;
+    scheduledAlarms[alarmSlot].time = time;
+    scheduledAlarms[alarmSlot].callback = callback;
 }
 
 static void clearScheduledAlarms(void)
@@ -115,4 +116,14 @@ static bool IsTimeMultipleOf100ms(uint32_t time)
         return true;
     else
         return false;
+}
+
+static int8_t FindEmptyAlarmSlot(void)
+{
+    for (int8_t i = 0; i < MAX_ALARMS; i++) {
+        if (scheduledAlarms[i].time == 0)
+            return i;
+    }
+
+    return -1;
 }
