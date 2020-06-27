@@ -1,0 +1,9 @@
+- Clock initializes correctly - OK
+- Alarms List Is Empty After Initialization - OK
+- Alarm callbacks are set correctly - For 1
+- Alarm callback triggers - For 1
+- No alarm is called if time there's no alarm configured in this time slot - For 1
+- Rejects too many alarms
+- Remove alarm callback works
+- Removed alarm callback doesn't trigger
+- Alarms are accepted only if time is a multiple of 100
