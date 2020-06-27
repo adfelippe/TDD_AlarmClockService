@@ -9,6 +9,7 @@ void setUp(void)
 
 void tearDown(void)
 {
+    AlarmClock_Deinit();
 }
 
 void DummyHello(void)
@@ -125,4 +126,28 @@ void test_AlarmClock_RemoveAlarmClockFreesListSlot(void)
     fillAlarmList();
     RemoveAlarmClock(100);
     TEST_ASSERT_EQUAL(ALARM_SET_OK, SetAlarmClockCallback(100, DummyHello));
+}
+
+void test_AlarmClock_MultipleAlarmsSetDoNotTriggerAtWrongTimesButTriggerAtRightTimes(void)
+{
+    SetAlarmClockCallback(500, DummyHello);
+    SetAlarmClockCallback(700, DummyHello);
+
+    FakeTimeService_SetCurrentTimeInMiliseconds(400);
+    TEST_ASSERT_EQUAL(EMPTY, FakeTimeService_WakeUpRoutine());
+
+    FakeTimeService_SetCurrentTimeInMiliseconds(500);
+    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
+
+    FakeTimeService_SetCurrentTimeInMiliseconds(600);
+    TEST_ASSERT_EQUAL(EMPTY, FakeTimeService_WakeUpRoutine());
+
+    FakeTimeService_SetCurrentTimeInMiliseconds(700);
+    TEST_ASSERT_EQUAL(CALLBACK_RUN, FakeTimeService_WakeUpRoutine());
+}
+
+void test_AlarmClock_Deinit_Leaves_AlarmsListEmpty(void)
+{
+    AlarmClock_Deinit();
+    TEST_ASSERT_EQUAL(0, GetAmountOfSetAlarms());
 }

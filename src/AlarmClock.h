@@ -23,5 +23,6 @@ uint32_t GetAmountOfSetAlarms(void);
 bool IsAlarmClockTimeSet(uint32_t time);
 AlarmCallback GetAlarmClockCallbackFromTime(uint32_t time);
 void RemoveAlarmClock(uint32_t time);
+void AlarmClock_Deinit(void);
 
 #endif // ALARMCLOCK_H

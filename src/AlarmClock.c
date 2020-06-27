@@ -9,14 +9,16 @@ static Alarm scheduledAlarms[MAX_ALARMS];
 
 static void scheduleAlarm(Alarm *scheduledAlarm, int time, AlarmCallback callback);
 static int8_t getAlarmTimePositionFromList(uint32_t time);
+static void clearScheduledAlarms(void);
 
 void AlarmClock_Init(void)
 {
+    clearScheduledAlarms();
+}
 
-    for (uint8_t i = 0; i < MAX_ALARMS; i++) {
-        scheduledAlarms[i].callback = NULL;
-        scheduledAlarms[i].time = 0;
-    }
+void AlarmClock_Deinit(void)
+{
+    clearScheduledAlarms();
 }
 
 int SetAlarmClockCallback(int time, AlarmCallback callback)
@@ -95,4 +97,12 @@ static void scheduleAlarm(Alarm *scheduledAlarm, int time, AlarmCallback callbac
 {
     scheduledAlarm->time = time;
     scheduledAlarm->callback = callback;
+}
+
+static void clearScheduledAlarms(void)
+{
+    for (uint8_t i = 0; i < MAX_ALARMS; i++) {
+        scheduledAlarms[i].callback = NULL;
+        scheduledAlarms[i].time = 0;
+    }
 }
